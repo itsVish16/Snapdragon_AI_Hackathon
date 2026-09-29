@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapFlow AI | Ambient Dictation on Snapdragon</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-light antialiased">
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="snapdragon-logo">
+          <span class="logo-icon">⚡</span>
+        </div>
+        <div>
+          <h1 class="brand-title">SnapFlow <span class="highlight">AI</span></h1>
+          <p class="brand-subtitle">Ambient Ultra-Low Latency Voice Copilot for Snapdragon® HP PCs</p>
+        </div>
+      </div>
+      
+      <div class="hardware-pill" id="hardwarePill">
+        <span class="status-indicator live"></span>
+        <span id="providerBadge">Connecting Hardware...</span>
+      </div>
+    </header>
+
+    <!-- Telemetry Status Bar -->
+    <section class="telemetry-grid">
+      <div class="telemetry-card">
+        <span class="telemetry-label">INFERENCE LATENCY</span>
+        <div class="telemetry-value"><span id="telemetryLatency">--</span> <small>ms</small></div>
+        <span class="telemetry-sub">Sub-Human Perception (< 100ms)</span>
+      </div>
+      <div class="telemetry-card">
+        <span class="telemetry-label">REAL-TIME FACTOR</span>
+        <div class="telemetry-value"><span id="telemetryRTF">--</span> <small>x</small></div>
+        <span class="telemetry-sub">Audio Processing Throughput</span>
+      </div>
+      <div class="telemetry-card highlight-card">
+        <span class="telemetry-label">HEXAGON NPU POWER</span>
+        <div class="telemetry-value"><span id="telemetryPower">1.6</span> <small>W</small></div>
+        <span class="telemetry-sub text-emerald">~12x Lower vs 20W x86 CPU</span>
+      </div>
+      <div class="telemetry-card">
+        <span class="telemetry-label">ENERGY SAVED</span>
+        <div class="telemetry-value"><span id="telemetryJoules">0.0</span> <small>J</small></div>
+        <span class="telemetry-sub">Accumulated Battery Preserved</span>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      
+      <!-- Left Column: Controls & Visualizer -->
+      <section class="panel control-panel">
+        <div class="panel-header">
+          <h2>Voice Stream Engine</h2>
+          <span class="badge" id="streamStatus">IDLE</span>
+        </div>
+
+        <!-- Big Mic Button -->
+        <div class="mic-container">
+          <button id="micBtn" class="mic-button" title="Click to start dictating">
+            <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+          <p class="mic-hint" id="micHint">Click to Start Ambient Dictation</p>
+        </div>
+
+        <!-- Waveform Visualizer -->
+        <div class="waveform-box">
+          <canvas id="waveformCanvas" width="400" height="70"></canvas>
+        </div>
+
+        <!-- Edge SLM Polish Settings -->
+        <div class="refiner-controls">
+          <div class="toggle-row">
+            <div>
+              <span class="toggle-title">Smart Refine (Edge SLM)</span>
+              <p class="toggle-desc">Turn messy speech into formatted text via on-device Llama-3.2</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="polishToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Style Selection Pills -->
+          <div class="style-pills" id="stylePills">
+            <button class="pill active" data-style="clean_verbatim">Clean Verbatim</button>
+            <button class="pill" data-style="executive_email">Executive Email</button>
+            <button class="pill" data-style="action_items">Action Items</button>
+            <button class="pill" data-style="code_docstring">Code / Docstring</button>
+          </div>
+        </div>
+
+        <!-- Mode Select -->
+        <div class="action-buttons">
+          <button id="testAudioBtn" class="btn btn-secondary">Simulate Audio Stream</button>
+          <button id="injectBtn" class="btn btn-primary">Type Into Active App</button>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Transcription & Export -->
+      <section class="panel text-panel">
+        <div class="panel-header">
+          <h2>Transcribed Output</h2>
+          <div class="header-actions">
+            <button id="copyBtn" class="btn-sm">Copy</button>
+            <button id="clearBtn" class="btn-sm">Clear</button>
+          </div>
+        </div>
+
+        <div class="transcription-container">
+          <div id="outputDisplay" class="output-textarea" contenteditable="true" placeholder="Start speaking. Your real-time transcription will stream here at ultra-low latency..."></div>
+        </div>
+
+        <div class="file-upload-section">
+          <h3>Drop Audio File (Meeting / Memo)</h3>
+          <div class="drop-zone" id="dropZone">
+            <p>Drag & drop <code>.wav</code>, <code>.mp3</code>, or <code>.m4a</code> here</p>
+            <input type="file" id="fileInput" accept="audio/*" style="display: none;">
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Powered by <strong>Qualcomm® AI Hub</strong> &amp; <strong>Hexagon™ NPU</strong> • Designed for HP OmniBook Ultra (Snapdragon X Elite)</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

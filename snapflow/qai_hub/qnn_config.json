@@ -1,0 +1,41 @@
+{
+  "execution_provider": "QNNExecutionProvider",
+  "target_platform": "Snapdragon X Elite / Snapdragon X Plus",
+  "hardware_engine": "Qualcomm Hexagon NPU (45 TOPS)",
+  "provider_options": {
+    "backend_path": "QnnHtp.dll",
+    "htp_performance_mode": "burst",
+    "htp_graph_finalization_optimization_mode": "3",
+    "enable_htp_fp16_precision": "1",
+    "soc_model": "60",
+    "qnn_context_priority": "high",
+    "vtcm_mb": "8"
+  },
+  "runtime_fallbacks": [
+    {
+      "provider": "DmlExecutionProvider",
+      "target": "DirectML (Adreno GPU)",
+      "device_id": 0
+    },
+    {
+      "provider": "CoreMLExecutionProvider",
+      "target": "Apple Neural Engine (macOS Developer Fallback)"
+    },
+    {
+      "provider": "CPUExecutionProvider",
+      "target": "Host CPU"
+    }
+  ],
+  "audio_pipeline": {
+    "sample_rate": 16000,
+    "channels": 1,
+    "vad_mode": "sliding_rms_energy",
+    "chunk_duration_sec": 1.5,
+    "overlap_sec": 0.2
+  },
+  "energy_model": {
+    "npu_active_watts": 1.6,
+    "cpu_active_watts": 20.0,
+    "idle_watts": 0.05
+  }
+}
