@@ -25,3 +25,11 @@ wheels/
 .venv
 *.log
 .DS_Store
+
+# Presentations and Documents
+*.pptx
+*.ppt
+*.pdf
+*.docx
+*.doc
+docs/
