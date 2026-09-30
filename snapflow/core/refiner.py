@@ -31,6 +31,16 @@ class EdgeRefiner:
         cleaned = self.filler_pattern.sub("", text)
         cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
+        word_to_num = {
+            "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+            "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+            "fifteen": "15", "twenty": "20", "thirty": "30", "forty": "40",
+            "fifty": "50", "hundred": "100", "thousand": "1000"
+        }
+        for w, n in word_to_num.items():
+            cleaned = re.sub(rf"\b{w}\s+dollars?\b", rf"${n}", cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(rf"\b{w}\s+percent\b", rf"{n}%", cleaned, flags=re.IGNORECASE)
+
         cleaned = re.sub(r"\b(\d+)\s+dollars?\b", r"$\1", cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r"\b(\d+)\s+percent\b", r"\1%", cleaned, flags=re.IGNORECASE)
 
@@ -94,11 +104,12 @@ class EdgeRefiner:
             f'"""'
         )
 
-    def refine(self, text: str, style: Optional[str] = None) -> Dict[str, Any]:
+    def refine(self, text: str, style: Optional[str] = None, force: bool = False) -> Dict[str, Any]:
         if not text:
             return {"original": "", "refined": "", "style": style or self.default_style, "latency_ms": 0.0}
 
-        if not self.is_enabled:
+        should_refine = force or self.is_enabled or (style is not None and style != "raw")
+        if not should_refine:
             return {"original": text, "refined": text, "style": "raw", "latency_ms": 0.0}
 
         t_start = time.perf_counter()
